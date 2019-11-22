@@ -1,0 +1,37 @@
+#!/usr/bin/env perl
+
+use Modern::Perl;
+use Getopt::Long;
+use Carp::Always;
+
+use Cube::Variables;
+use Graph::Undirected;
+use Graph::Directed;
+
+GetOptions(
+    "undirected" => \my $undirected,
+    "binary"     => \my $binary,
+    "transpose"  => \my $transpose,
+) or die pod2usage(2);
+
+die "doesn't make sense to transpose an undirected graph"
+    if $undirected and $transpose;
+
+my $graph = defined($undirected) ?
+    Graph::Undirected->new(@ARGV) :
+    Graph::Directed->new(@ARGV);
+$graph = $graph->transpose if $transpose;
+
+my $vars = Cube::Variables->new(set => [$graph->vertices]);
+
+for my $x ($vars->list) {
+    my ($i, $j, @K) = @$x;
+    if ($binary) {
+        # Yes, a 0 marks an ACTIVE CI statement.
+        print $graph->ci($i, $j, @K) ? "0" : "1";
+    }
+    else {
+        say "($i$j|@{[ join '', @K ]})" if $graph->ci($i, $j, @K);
+    }
+}
+say "" if $binary;
