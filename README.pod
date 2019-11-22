@@ -1,0 +1,90 @@
+=head1 NAME
+
+graph-ci - Compute separation in undirected graphs and DAGs
+
+=head1 SYNOPSIS
+
+    # Compute d-separation statements in a DAG with given edges
+    $ graph-ci 13 34 14 23 24
+    (12|)
+
+    # Same edges but undirected
+    $ graph-ci --undirected 13 34 14 23 24
+    (12|34)
+
+    # Larger example, gaussoids.de-compatible output
+    $ graph-ci --binary 13 14 32 42 56 67
+    11111111111111101111111000110000
+    11111111111111111111111111111111
+    11111111111111111111111111111111
+    00000000000000000000000000000000
+    00000000000000000000000000000000
+    00000000000000000000000000000000
+    11111111111111111111111111111111
+    11111111111111111111111111111111
+    00000000000000000000000000000000
+    00000000000000000000000000000000
+    00000000000000000000000000000000
+    11111011111100011111000111101111
+    00000000000000000000000000000000
+    00000000000000000000000000000000
+    00000000000000000000000000000000
+    00000000000000000000000000000000
+    00000000000000000000000000000000
+    00000000000000000000000000000000
+    11111111111111111111111111111111
+    10111100101101110001001011000010
+    11111111111111111111111111111111
+    # (the length tends to grow quite fast)
+
+=head1 OPTIONS
+
+=over
+
+=item B<--undirected>
+
+Consider the graph undirected. The default is directed. This also
+changes the meaning of separation.
+
+=item B<--binary>
+
+Instead of the default C<(ab|C)> output format, print a binary string
+compatible with L<https://gaussoids.de>.
+
+=item B<--transpose>
+
+For a directed graph, consider its transpose, i.e. the graph where all
+edge directions are inverted.
+
+=back
+
+=head1 DESCRIPTION
+
+This repository contains a few Perl modules and a script for computing
+undirected separation and d-separation statements in graphs. In graphical
+modeling in statistics, these separation statements are just the conditional
+independence  statements valid for a faithful distribution, explaining the
+name C<graph-ci>.
+
+A graph is represtend on the command-line by its list of edges. Each edge
+is a 2-character string where each character identifies a vertex. Note that
+isolated vertices are not encodable but they are superfluous anyway.
+The order of vertices in an edge matters if the graph is directed; the
+first vertex is the source, the second the target.
+
+The default output lists all valid separation statements in the form
+C<(ab|C)> where C<a> and C<b> are single vertices and C<C> is a (possibly
+empty) list of vertices. This means that C<a> and C<b> are separated in
+the given graph by C<C>. It is known that these pairwise statements are
+sufficient to reconstruct all separation statements.
+
+=head1 AUTHOR
+
+Tobias Boege <tobs@taboege.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (C) 2019 by Tobias Boege.
+
+This is free software; you can redistribute it and/or
+modify it under the terms of the Artistic License 2.0.

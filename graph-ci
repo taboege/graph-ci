@@ -12,7 +12,8 @@ GetOptions(
     "undirected" => \my $undirected,
     "binary"     => \my $binary,
     "transpose"  => \my $transpose,
-) or die pod2usage(2);
+) or die "failed parsing options";
+# TODO: should put the README.pod into this file and pod2usage
 
 die "doesn't make sense to transpose an undirected graph"
     if $undirected and $transpose;
