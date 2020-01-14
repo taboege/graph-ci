@@ -8,7 +8,8 @@ use parent 'Clone';
 # Takes an array of character pairs "12", "21", "1a", etc. which represent
 # edges 1 - 2, 2 - 1, 1 - a. Edges are undirected, i.e. "12" and "21" are
 # the same. Each vertex is represented by one character for easy CLI typing.
-# Note that isolated vertices are not supported.
+# Isolated vertices can just be named, like "1" or "3", so they don't form
+# an edge.
 #
 # Returns an undirected graph which is a hash that associates to each vertex
 # a hash representation of its adjacency list: each adjacent vertex as a key
@@ -17,6 +18,11 @@ sub new {
     my $self = bless {}, shift;
     for (@_) {
         my ($i, $j) = split //;
+        # Isolated vertices are ok, just add them to the list of vertices.
+        if ($j eq "") {
+            $self->{$i} = {};
+            next;
+        }
         $self->{$i}->{$j} = 1;
         $self->{$j}->{$i} = 1;
     }

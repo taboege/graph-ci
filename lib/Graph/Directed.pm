@@ -7,7 +7,8 @@ use parent 'Clone';
 
 # Takes an array of character pairs "12", "21", "1a", etc. which represent
 # directed edges 1 -> 2, 2 -> 1, 1 -> a. Each vertex is represented by one
-# character for easy CLI typing. Note that isolated vertices are not supported.
+# character for easy CLI typing. Isolated vertices can just be named, like
+# "1" or "3", so they don't form an edge.
 #
 # Returns a digraph which is a hash that associates to each vertex a pair
 # of hashes, for the incoming and the outgoing edges. Each hash stores a
@@ -17,6 +18,11 @@ sub new {
     my $self = bless {}, shift;
     for (@_) {
         my ($i, $j) = split //;
+        # Isolated vertices are ok, just add them to the list of vertices.
+        if ($j eq "") {
+            $self->{$i} = {};
+            next;
+        }
         $self->{$i}->{out}->{$j} = 1;
         $self->{$j}->{in}->{$i}  = 1;
     }
