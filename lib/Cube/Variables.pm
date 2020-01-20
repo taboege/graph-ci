@@ -64,7 +64,7 @@ sub new {
         for my $j (($i+1) .. $n) {
             my @M = grep { $_ != $i and $_ != $j } 1 .. $n;
             for my $k (0 .. @M) {
-                for my $L (reverse subsets([@M], $k)) {
+                for my $L (subsets([@M], $k)) {
                     my $face = [$i,$j,sort @$L];
                     $faces[$v] = $face;
                     $names[$v] = "$i$j|" . join('', @$L);
@@ -84,7 +84,7 @@ sub _compute_dimension {
     my $n = 2;
 
     while (1) {
-        my $nvars = $n * ($n - 1) * 2 ** ($n - 3);
+        my $nvars = _compute_vars($n);
         return $n if $nvars == $vars;
         last if $nvars > $vars;
         $n++;
