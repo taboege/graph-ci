@@ -20,7 +20,7 @@ sub new {
         my ($i, $j) = split //;
         # Isolated vertices are ok, just add them to the list of vertices.
         if ($j eq "") {
-            $self->{$i} = {};
+            $self->{$i} = { out => {}, in => {} };
             next;
         }
         $self->{$i}->{out}->{$j} = 1;
@@ -115,6 +115,8 @@ sub moralize {
                 push @edges, "$i$j";
             }
         }
+        # Preserve all vertices, even the isolated ones.
+        push @edges, $k;
     }
 
     # Make an undirected graph.
