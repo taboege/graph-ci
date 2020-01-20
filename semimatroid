@@ -1,0 +1,19 @@
+#!/usr/bin/env perl
+
+use Modern::Perl;
+use Carp::Always;
+
+use Cube::Variables;
+use Simplex::Variables;
+use Polymatroid;
+
+my $set  = [split //, (shift // die 'need an alphabet')];
+my $dom  = Simplex::Variables->new(set => $set);
+my $rank = shift // die 'need a rank function';
+my $h    = Polymatroid->new($rank, $dom);
+my $vars = Cube::Variables->new(set => $set);
+
+for my $x ($vars->list) {
+    print $h->ci(@$x) ? "0" : "1";
+}
+say "";

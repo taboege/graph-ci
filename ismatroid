@@ -1,0 +1,43 @@
+#!/usr/bin/env perl
+
+use Modern::Perl;
+use Carp::Always;
+use bignum;
+
+use Set::Scalar;
+use Simplex::Variables;
+
+my $set  = [split //, (shift // die 'need an alphabet')];
+my $dom  = Simplex::Variables->new(set => $set);
+my $rank = shift // die 'need a rank function';
+
+my @ranks = ("NaN", split //, $rank);
+
+my $emptyset = $dom->pack([ ]);
+say "FAIL normalization" unless $ranks[$emptyset] == 0;
+
+for my $A ($dom->list) {
+    for my $B ($dom->list) {
+        my $x = Set::Scalar->new(@$A);
+        my $y = Set::Scalar->new(@$B);
+
+        my $X  = $dom->pack([$x->members]);
+        my $Y  = $dom->pack([$y->members]);
+        my $XY = $dom->pack([($x + $y)->members]);
+        my $K  = $dom->pack([($x * $y)->members]);
+
+        say "FAIL submodularity at $x; $y" unless
+            $ranks[$X] + $ranks[$Y] >= $ranks[$XY] + $ranks[$K];
+    }
+}
+
+my $U = Set::Scalar->new(@$set);
+for my $A ($dom->list) {
+    my $x = Set::Scalar->new(@$A);
+    my $X = $dom->pack([$x->members]);
+    for my $b (($U - $x)->members) {
+        my $Y = $dom->pack([($x + Set::Scalar->new($b))->members]);
+        say "FAIL " unless
+            $ranks[$X] <= $ranks[$Y] && $ranks[$Y] <= $ranks[$X] + 1;
+    }
+}
