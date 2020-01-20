@@ -51,7 +51,8 @@ sub new {
     # implementation of subsets in Algorithm::Combinatorics.
     #
     # DANGER: If the implementation of subsets is changed,
-    # this will suddenly produce wrong axioms!
+    # this will suddenly produce wrong axioms! But we have
+    # a test for the correct ordering in t/.
     use Algorithm::Combinatorics qw(subsets);
 
     $self->{faces}   = \my @faces;
@@ -65,10 +66,11 @@ sub new {
             my @M = grep { $_ != $i and $_ != $j } 1 .. $n;
             for my $k (0 .. @M) {
                 for my $L (subsets([@M], $k)) {
-                    my $face = [$i,$j,sort @$L];
+                    my $face = [map { $self->{set}->[$_-1] } ($i,$j,sort @$L)];
+                    my $name = _name($face);
                     $faces[$v] = $face;
-                    $names[$v] = "$i$j|" . join('', @$L);
-                    $numbers{join '', @$face} = $v;
+                    $names[$v] = $name;
+                    $numbers{$name} = $v;
                     $v++;
                 }
             }
@@ -97,6 +99,11 @@ sub _compute_vars {
     $n * ($n - 1) * 2 ** ($n - 3)
 }
 
+sub _name {
+    my ($i, $j, @K) = @{+shift};
+    "$i$j|" . join('', sort @K)
+}
+
 sub list {
     my $self = shift;
     @{$self->{faces}}[1 .. $self->{vars}]
@@ -113,7 +120,7 @@ sub unpack {
 
 sub pack {
     my $self = shift;
-    my $ijK = join '', @{+shift};
+    my $ijK = _name(shift);
     $self->{numbers}->{$ijK} // die "lookup failed on $ijK";
 }
 
